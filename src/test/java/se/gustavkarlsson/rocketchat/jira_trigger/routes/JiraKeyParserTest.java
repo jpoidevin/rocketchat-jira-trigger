@@ -51,7 +51,9 @@ public class JiraKeyParserTest {
 					{"\tABC-123\t"},
 					{" ABC-123 "},
 					{"A1BC3-123"},
-					{"AB3-123"}
+					{"AB3-123"},
+					{"lorem abc 123 ipsum"},
+					{"lorem abc-123 ipsum"},
 			});
 		}
 

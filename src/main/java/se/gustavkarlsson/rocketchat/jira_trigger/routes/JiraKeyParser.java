@@ -1,5 +1,6 @@
 package se.gustavkarlsson.rocketchat.jira_trigger.routes;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -13,7 +14,7 @@ import static com.google.common.collect.Sets.union;
 import static org.apache.commons.lang3.Validate.notNull;
 
 class JiraKeyParser {
-	private static final Pattern JIRA_KEY = Pattern.compile("[A-Z][A-Z0-9]+-\\d+");
+	private static final Pattern JIRA_KEY = Pattern.compile("([A-Z][A-Z0-9]+)[-_ ](\\d+)", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 	private static final Set<Character> ALWAYS_VALID = new HashSet<>(Arrays.asList(' ', '\t', '\n'));
 
 	private final Set<Character> whitelistedPrefixes;
@@ -45,13 +46,17 @@ class JiraKeyParser {
 		Matcher matcher = JIRA_KEY.matcher(text);
 		Set<String> jiraKeys = new HashSet<>();
 		while (matcher.find()) {
-			String key = matcher.group();
-			if (!hasValidContext(key, text)) {
+			String key = format(matcher);
+			if (!hasValidContext(matcher.group(0), text)) {
 				continue;
 			}
 			jiraKeys.add(key);
 		}
 		return jiraKeys;
+	}
+
+	private String format(Matcher matcher) {
+		return StringUtils.upperCase(matcher.group(1)) + "-" + matcher.group(2);
 	}
 
 	private boolean hasValidContext(String key, String text) {
